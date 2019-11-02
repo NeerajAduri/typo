@@ -16,6 +16,26 @@ describe Admin::CategoriesController do
     assert_response :redirect, :action => 'index'
   end
 
+  describe "test_create" do
+    before(:each) do
+      get :new
+    end
+
+    it 'should render template new' do
+      assert_template 'new'
+      assert_tag :tag => "table",
+        :attributes => { :id => "category_container" }
+    end
+
+    it 'should create category' do
+      post :edit, :category => {:name => "newname", :keywords => "newkey", :description => "newdesc"}
+      assert_response :redirect, :action => 'index'
+      expect(assigns(:categories).should_not be_nil)
+      #Category was successfully saved.
+      expect(flash[:notice]).to eq("Category was successfully saved.")
+    end
+  end
+
   describe "test_edit" do
     before(:each) do
       get :edit, :id => Factory(:category).id
@@ -61,6 +81,18 @@ describe Admin::CategoriesController do
     assert_response :redirect, :action => 'index'
 
     assert_raise(ActiveRecord::RecordNotFound) { Category.find(test_id) }
+  end
+  
+  describe "GET new category" do
+    it "assigns new category" do
+      get :new
+      expect(assigns(:category)).to be_a_new(Category)
+    end
+    
+    it "assigns all categories" do
+      get :new
+      expect(assigns(:categories)).to eq(Category.all)
+    end
   end
   
 end
